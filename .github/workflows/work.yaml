@@ -16,9 +16,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 1. הוסר שלב הקמת Cluster
-      # ה-Workflow מניח שה-Runner רץ בסביבה שכבר יש לה
-      # Kubeconfig תקין המצביע על ה-Kind Cluster הקיים שלך.
+      # 1. הקמת Cluster של Kind
+      # [FIX] החזרתי את השלב הזה. הוא יוצר Kind Cluster בתוך ה-Runner.
+      # זה פותר את שגיאת ה-"connection refused"
+      - name: Set up Kind Cluster
+        uses: helm/kind-action@v1.9.0
+        # פעולה זו מגדירה אוטומטית את kubectl
+        # כך שהוא "מצביע" על ה-cluster החדש שנוצר
 
       # 2. יוצרים סיקרט ב-K8s מהסיקרט של GitHub
       - name: Create or Update Kubernetes Secret
