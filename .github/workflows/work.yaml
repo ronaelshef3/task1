@@ -16,7 +16,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 1. הקמת Cluster של Kind
+      # 1. הקמת Clust er של Kind
       # [FIX] החזרתי את השלב הזה. הוא יוצר Kind Cluster בתוך ה-Runner.
       # זה פותר את שגיאת ה-"connection refused"
       - name: Set up Kind Cluster
