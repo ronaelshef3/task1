@@ -1,0 +1,69 @@
+name: Deploy to Kubernetes
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+permissions:
+  contents: write # נדרש כדי לבצע 'git push'
+  # ... (ייתכן שתצטרך הרשאות נוספות להתחברות ל-cluster)
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # ... (כאן חסרים שלבים להתחברות ל-cluster שלך, למשל Kubeconfig) ...
+      # - name: Set Kubeconfig
+      #   uses: ...
+
+      # 1. יוצרים סיקרט ב-K8s מהסיקרט של GitHub
+      - name: Create or Update Kubernetes Secret
+        run: |
+          kubectl create secret generic my-app-secret \
+            --from-literal=username=${{ secrets.MY_USERNAME_SECRET }} \
+            --namespace=my-namespace \ # ודא שזה ה-namespace הנכון
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      # 2. מריצים Helm
+      - name: Deploy Helm Chart
+        run: |
+          # ודא שהנתיב ל-chart ('./my-helm-chart') נכון
+          # ודא שה-namespace מוגדר (אם צריך)
+          helm upgrade --install my-release ./my-helm-chart --namespace my-namespace
+
+      # 3. מגדירים את התג החדש
+      - name: Define New Image Tag
+        run: echo "NEW_TAG=v0.${{ github.run_number }}" >> $GITHUB_ENV
+
+      # 4. מעדכנים את קובץ ה-values (הדרך הנכונה, עם 'sed')
+      - name: Update values.yaml with new image tag
+        run: |
+          # ודא שהנתיב לקובץ (mychar/values-image.yaml) נכון
+          sed -i 's|^\( *tag: *\).*|\1"${{ env.NEW_TAG }}"|' mychar/values-image.yaml
+          
+          echo "--- Updated values-image.yaml ---"
+          cat mychar/values-image.yaml
+          echo "---------------------------------"
+
+      # 5. מבצעים Commit לקובץ המעודכן
+      - name: Commit updated values.yaml
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git status
+          
+          # הוספה של הקובץ הספציפי ששינינו
+          git add mychar/values-image.yaml
+          
+          # בודק אם באמת יש שינוי לפני שמנסה לעשות commit
+          if ! git diff --staged --quiet; then
+            git commit -m "Update image tag to ${{ env.NEW_TAG }} [skip ci]"
+            git push
+          else
+            echo "No changes to commit."
+          fi
