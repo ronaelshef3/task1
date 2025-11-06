@@ -36,8 +36,8 @@ jobs:
       # 3. מריצים Helm
       - name: Deploy Helm Chart
         run: |
-          # ודא שהנתיב ל-chart ('./my-helm-chart') נכון
-          helm upgrade --install my-release ./my-helm-chart --wait
+          # ודא שהנתיב ל-chart ('./myChart') נכון
+          helm upgrade --install my-release ./myChart --wait
           # הוספתי --wait כדי שה-workflow יחכה שהפריסה תסתיים
 
       # 4. מגדירים את התג החדש
@@ -47,8 +47,8 @@ jobs:
       # 5. מעדכנים את קובץ ה-values (הדרך הנכונה, עם 'sed')
       - name: Update values.yaml with new image tag
         run: |
-          # ודא שהנתיב לקובץ (mychar/values-image.yaml) נכון
-          sed -i 's|^\( *tag: *\).*|\1"${{ env.NEW_TAG }}"|' mychar/values-image.yaml
+          # ודא שהנתיב לקובץ (myChart/values-image.yaml) נכון
+          sed -i 's|^\( *tag: *\).*|\1"${{ env.NEW_TAG }}"|' myChart/values-image.yaml
           
           echo "--- Updated values-image.yaml ---"
           cat mychar/values-image.yaml
@@ -62,7 +62,7 @@ jobs:
           git status
           
           # הוספה של הקובץ הספציפי ששינינו
-          git add mychar/values-image.yaml
+          git add myChart/values-image.yaml
           
           # בודק אם באמת יש שינוי לפני שמנסה לעשות commit
           if ! git diff --staged --quiet; then
