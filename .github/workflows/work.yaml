@@ -1,4 +1,4 @@
-name: Deploy to Kubernetes
+name: Kind CI Workflow
 
 on:
   push:
@@ -8,40 +8,39 @@ on:
 
 permissions:
   contents: write # נדרש כדי לבצע 'git push'
-  # ... (ייתכן שתצטרך הרשאות נוספות להתחברות ל-cluster)
 
 jobs:
-  deploy:
+  deploy-to-kind:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # ... (כאן חסרים שלבים להתחברות ל-cluster שלך, למשל Kubeconfig) ...
-      # - name: Set Kubeconfig
-      #   uses: ...
+      # 1. הוסר שלב הקמת Cluster
+      # ה-Workflow מניח שה-Runner רץ בסביבה שכבר יש לה
+      # Kubeconfig תקין המצביע על ה-Kind Cluster הקיים שלך.
 
-
+      # 2. יוצרים סיקרט ב-K8s מהסיקרט של GitHub
       - name: Create or Update Kubernetes Secret
         run: |
-           # ודא שזה ה-namespace הנכון
+          # כאן אין צורך לציין --namespace כי Kind
+          # בדרך כלל משתמש ב-default, אלא אם הגדרת אחרת
           kubectl create secret generic my-app-secret \
             --from-literal=username='${{ secrets.MY_USERNAME_SECRET }}' \
-            --namespace=my-namespace \
             --dry-run=client -o yaml | kubectl apply -f -
 
-      # 2. מריצים Helm
+      # 3. מריצים Helm
       - name: Deploy Helm Chart
         run: |
           # ודא שהנתיב ל-chart ('./my-helm-chart') נכון
-          # ודא שה-namespace מוגדר (אם צריך)
-          helm upgrade --install my-release ./my-helm-chart --namespace my-namespace
+          helm upgrade --install my-release ./my-helm-chart --wait
+          # הוספתי --wait כדי שה-workflow יחכה שהפריסה תסתיים
 
-      # 3. מגדירים את התג החדש
+      # 4. מגדירים את התג החדש
       - name: Define New Image Tag
         run: echo "NEW_TAG=v0.${{ github.run_number }}" >> $GITHUB_ENV
 
-      # 4. מעדכנים את קובץ ה-values (הדרך הנכונה, עם 'sed')
+      # 5. מעדכנים את קובץ ה-values (הדרך הנכונה, עם 'sed')
       - name: Update values.yaml with new image tag
         run: |
           # ודא שהנתיב לקובץ (mychar/values-image.yaml) נכון
@@ -51,7 +50,7 @@ jobs:
           cat mychar/values-image.yaml
           echo "---------------------------------"
 
-      # 5. מבצעים Commit לקובץ המעודכן
+      # 6. מבצעים Commit לקובץ המעודכן
       - name: Commit updated values.yaml
         run: |
           git config --global user.name "github-actions[bot]"
