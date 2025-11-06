@@ -21,7 +21,7 @@ jobs:
       # - name: Set Kubeconfig
       #   uses: ...
 
-      # 1. יוצרים סיקרט ב-K8s מהסיקרט של GitHub
+
       - name: Create or Update Kubernetes Secret
         run: |
            # ודא שזה ה-namespace הנכון
