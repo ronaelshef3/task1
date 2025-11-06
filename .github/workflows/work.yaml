@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v3
 
       # 1. הקמת Clust er של Kind
-      # [FIX] החזרתי את השלב הזה. הוא יוצר Kind Cluster בתוך ה-Runner.
+      # [FIX] החזרתי את השלב הזה. הוא יוצר Kind  Cluster בתוך ה-Runner.
       # זה פותר את שגיאת ה-"connection refused"
       - name: Set up Kind Cluster
         uses: helm/kind-action@v1.9.0
