@@ -36,9 +36,9 @@ jobs:
       # 3. מריצים Helm
       - name: Deploy Helm Chart
         run: |
-          # ודא שהנתיב ל-chart ('./my-chart') נכון
+         
           helm upgrade --install my-release ./my-chart --wait
-          # הוספתי --wait כדי שה-workflow יחכה שהפריסה תסתיים
+         
 
       # 4. מגדירים את התג החדש
       - name: Define New Image Tag
