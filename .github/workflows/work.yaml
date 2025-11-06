@@ -24,9 +24,10 @@ jobs:
       # 1. יוצרים סיקרט ב-K8s מהסיקרט של GitHub
       - name: Create or Update Kubernetes Secret
         run: |
+           # ודא שזה ה-namespace הנכון
           kubectl create secret generic my-app-secret \
-            --from-literal=username=${{ secrets.MY_USERNAME_SECRET }} \
-            --namespace=my-namespace \ # ודא שזה ה-namespace הנכון
+            --from-literal=username='${{ secrets.MY_USERNAME_SECRET }}' \
+            --namespace=my-namespace \
             --dry-run=client -o yaml | kubectl apply -f -
 
       # 2. מריצים Helm
