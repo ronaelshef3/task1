@@ -51,7 +51,7 @@ jobs:
           sed -i 's|^\( *tag: *\).*|\1"${{ env.NEW_TAG }}"|' my-chart/values-image.yaml
           
           echo "--- Updated values-image.yaml ---"
-          cat mychart/values-image.yaml
+          cat my-chart/values-image.yaml
           echo "---------------------------------"
 
       # 6. מבצעים Commit לקובץ המעודכן
