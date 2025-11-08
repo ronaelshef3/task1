@@ -37,7 +37,7 @@ jobs:
       - name: Deploy Helm Chart
         run: |
          
-          helm upgrade --install my-release ./my-chart --wait
+          helm upgrade --install my-release ./my-chart ./my-chart/values-image.yaml --wait
          
 
 #      # 4. מגדירים את התג החדש
