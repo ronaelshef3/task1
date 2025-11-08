@@ -8,8 +8,19 @@ spec:
   type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.service.port }}
-      targetPort: http
+
+      # 1. תיקון: לקרוא את הערך מה-values
+      targetPort: {{ .Values.service.targetPort }}
+
       protocol: TCP
       name: http
+
+      # 2. תיקון: להוסיף את שדה ה-nodePort
+      # הבלוק הזה מוודא שהשדה יתווסף רק אם הטיפוס הוא NodePort
+      # ויש ערך ב-values
+      {{- if (and (eq .Values.service.type "NodePort") (not (empty .Values.service.nodePort))) }}
+      nodePort: {{ .Values.service.nodePort }}
+      {{- end }}
+
   selector:
     {{- include "my-chart.selectorLabels" . | nindent 4 }}
