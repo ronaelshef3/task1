@@ -40,34 +40,34 @@ jobs:
           helm upgrade --install my-release ./my-chart --wait
          
 
-      # 4. מגדירים את התג החדש
-      - name: Define New Image Tag
-        run: echo "NEW_TAG=v0.${{ github.run_number }}" >> $GITHUB_ENV
-
-      # 5. מעדכנים את קובץ ה-values (הדרך הנכונה, עם 'sed')
-      - name: Update values.yaml with new image tag
-        run: |
-          # ודא שהנתיב לקובץ (my-chart/values-image.yaml) נכון
-          sed -i 's|^\( *tag: *\).*|\1"${{ env.NEW_TAG }}"|' my-chart/values-image.yaml
-          
-          echo "--- Updated values-image.yaml ---"
-          cat my-chart/values-image.yaml
-          echo "---------------------------------"
-
-      # 6. מבצעים Commit לקובץ המעודכן
-      - name: Commit updated values.yaml
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git status
-          
-          # הוספה של הקובץ הספציפי ששינינו
-          git add my-chart/values-image.yaml
-          
-          # בודק אם באמת יש שינוי לפני שמנסה לעשות commit
-          if ! git diff --staged --quiet; then
-            git commit -m "Update image tag to ${{ env.NEW_TAG }} [skip ci]"
-            git push
-          else
-            echo "No changes to commit."
-          fi
+#      # 4. מגדירים את התג החדש
+#      - name: Define New Image Tag
+#        run: echo "NEW_TAG=v0.${{ github.run_number }}" >> $GITHUB_ENV
+#
+#      # 5. מעדכנים את קובץ ה-values (הדרך הנכונה, עם 'sed')
+#      - name: Update values.yaml with new image tag
+#        run: |
+#          # ודא שהנתיב לקובץ (my-chart/values-image.yaml) נכון
+#          sed -i 's|^\( *tag: *\).*|\1"${{ env.NEW_TAG }}"|' my-chart/values-image.yaml
+#
+#          echo "--- Updated values-image.yaml ---"
+#          cat my-chart/values-image.yaml
+#          echo "---------------------------------"
+#
+#      # 6. מבצעים Commit לקובץ המעודכן
+#      - name: Commit updated values.yaml
+#        run: |
+#          git config --global user.name "github-actions[bot]"
+#          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+#          git status
+#
+#          # הוספה של הקובץ הספציפי ששינינו
+#          git add my-chart/values-image.yaml
+#
+#          # בודק אם באמת יש שינוי לפני שמנסה לעשות commit
+#          if ! git diff --staged --quiet; then
+#            git commit -m "Update image tag to ${{ env.NEW_TAG }} [skip ci]"
+#            git push
+#          else
+#            echo "No changes to commit."
+#          fi
